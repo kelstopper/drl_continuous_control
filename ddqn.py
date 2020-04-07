@@ -52,7 +52,7 @@ def ddpg(n_episodes=1000, max_t=1200, print_every=100):
             dones = env_info.local_done
             scores += env_info.rewards
             
-#             print('\rEpisode {}\tScore: {}\tTimestep: {}\tAction: {}\t\t'.format(i_episode, scores.mean(), t, actions[0]), end="")
+            # print('\rEpisode {}\tScore: {}\tTimestep: {}\tAction: {}\t\t'.format(i_episode, scores.mean(), t, actions[0]), end="")
             
             # need to step for each state
             # for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
