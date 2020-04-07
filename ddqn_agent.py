@@ -19,20 +19,24 @@ import torch.optim as optim
 # WEIGHT_DECAY = 0        # L2 weight decay
 ###################### DEAFULTS ######################
 
-BUFFER_SIZE = int(1e6)  # replay buffer size
-BATCH_SIZE = 40         # minibatch size
+BUFFER_SIZE = int(1e5)  # replay buffer size
+BATCH_SIZE = 20         # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor 
 LR_CRITIC = 1e-3        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay
-UPDATE_EVERY = 20
-UPDATE_COUNT = 10
+UPDATE_EVERY = 15
+UPDATE_COUNT = 5
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    print("training on GPU")
+else:
+    print("training on CPU")
 
 class MultiAgent():
-    def __init__(self, state_size, action_size, random_seed, num_agents, share_critic=True):
+    def __init__(self, state_size, action_size, random_seed, num_agents):
         """Initialize a MultiAgent object.
         
         Params
@@ -48,18 +52,10 @@ class MultiAgent():
         self.action_size = action_size
         self.seed = random.seed(random_seed)
         self.num_agents = num_agents
-        self.share_critic = share_critic
 
         self.agents = []
         for i in range(num_agents):
-            self.agents.append(Agent(state_size, action_size, random_seed, with_memory=False, with_critic=not share_critic))
-
-
-        if share_critic:
-            raise Exception("make sure we are not here")
-        #     self.critic_local = Critic(state_size, action_size, random_seed).to(device)
-        #     self.critic_target = Critic(state_size, action_size, random_seed).to(device)
-        #     self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=LR_CRITIC, weight_decay=WEIGHT_DECAY)
+            self.agents.append(Agent(state_size, action_size, random_seed, with_memory=False))
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
@@ -85,83 +81,43 @@ class MultiAgent():
         self.t_step = (self.t_step + 1) % UPDATE_EVERY
 
         if len(self.memory) > BATCH_SIZE and self.t_step == 0:
-            for i in range(UPDATE_COUNT):
-                for agent in self.agents:
+            for agent in self.agents:
+                for _ in range(UPDATE_COUNT):
                     experiences = self.memory.sample()
-                    self.learn(agent, experiences, GAMMA)
+                    agent.learn(experiences, GAMMA)
 
-    def learn(self, agent, experiences, gamma):
-        """Update policy and value parameters using given batch of experience tuples.
-        Q_targets = r + γ * critic_target(next_state, actor_target(next_state))
-        where:
-            actor_target(state) -> action
-            critic_target(state, action) -> Q-value
+    # def learn(self, agent, experiences, gamma):
+    #     """Update policy and value parameters using given batch of experience tuples.
+    #     Q_targets = r + γ * critic_target(next_state, actor_target(next_state))
+    #     where:
+    #         actor_target(state) -> action
+    #         critic_target(state, action) -> Q-value
 
-        Params
-        ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples 
-            gamma (float): discount factor
-        """
+    #     Params
+    #     ======
+    #         experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples 
+    #         gamma (float): discount factor
+    #     """
 
-        if not self.share_critic:
-            agent.learn(experiences, gamma)
-        else:
-            raise Exception("make sure we are not here")
-        #     states, actions, rewards, next_states, dones = experiences
+    #     agent.learn(experiences, gamma)
 
-        #     # ---------------------------- update critic ---------------------------- #
-        #     # Get predicted next-state actions and Q values from target models
-        #     actions_next = agent.actor_target(next_states)
-        #     Q_targets_next = self.critic_target(next_states, actions_next)
-        #     # Compute Q targets for current states (y_i)
-        #     # Q_targets = rewards.view(-1, 1) + torch.mm((gamma * Q_targets_next).view(-1, 1), (1 - dones).view(-1, 1).t())
-        #     Q_targets_next = gamma * Q_targets_next * (1 - dones).unsqueeze(-1)
-        #     Q_targets = rewards.unsqueeze(-1) + Q_targets_next
-        #     # Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
-        #     # Compute critic loss
-        #     Q_expected = self.critic_local(states, actions)
-        #     # critic_loss = F.mse_loss(Q_expected.view(-1, 1), Q_targets)
-        #     critic_loss = F.mse_loss(Q_expected, Q_targets)
-        #     # Minimize the loss
-        #     self.critic_optimizer.zero_grad()
-        #     critic_loss.backward()
-        #     self.critic_optimizer.step()
+    # def soft_update(self, local_model, target_model, tau):
+    #     """Soft update model parameters.
+    #     θ_target = τ*θ_local + (1 - τ)*θ_target
 
-        #     # ---------------------------- update actor ---------------------------- #
-        #     # Compute actor loss
-        #     actions_pred = agent.actor_local(states)
-        #     actor_loss = -self.critic_local(states, actions_pred).mean()
-        #     # Minimize the loss
-        #     agent.actor_optimizer.zero_grad()
-        #     actor_loss.backward()
-        #     agent.actor_optimizer.step()
-
-        #     # ----------------------- update target networks ----------------------- #
-        #     self.soft_update(self.critic_local, self.critic_target, TAU)
-        #     self.soft_update(agent.actor_local, agent.actor_target, TAU)
-
-    def soft_update(self, local_model, target_model, tau):
-        """Soft update model parameters.
-        θ_target = τ*θ_local + (1 - τ)*θ_target
-
-        Params
-        ======
-            local_model: PyTorch model (weights will be copied from)
-            target_model: PyTorch model (weights will be copied to)
-            tau (float): interpolation parameter 
-        """
-        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
-            target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
+    #     Params
+    #     ======
+    #         local_model: PyTorch model (weights will be copied from)
+    #         target_model: PyTorch model (weights will be copied to)
+    #         tau (float): interpolation parameter 
+    #     """
+    #     for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
+    #         target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
 
     def save(self, actor_save_name, critic_save_name):
-        if self.share_critic:
-            for agent, i in zip(self.agents, range(self.num_agents)):
-                torch.save(agent.actor_local.state_dict(), '{}_{}.pth'.format(actor_save_name, i))
-            torch.save(self.critic_local.state_dict(), critic_save_name + '.pth')
-        else:
-            for agent, i in zip(self.agents, range(self.num_agents)):
-                torch.save(agent.actor_local.state_dict(), '{}_{}.pth'.format(actor_save_name, i))
-                torch.save(agent.critic_local.state_dict(), '{}_{}.pth'.format(critic_save_name, i))
+        for agent, i in zip(self.agents, range(self.num_agents)):
+            torch.save(agent.actor_local.state_dict(), '{}_{}.pth'.format(actor_save_name, i))
+            torch.save(agent.critic_local.state_dict(), '{}_{}.pth'.format(critic_save_name, i))
 
     def load(self, actor_save_name, map_location='cpu'):
         # If all the agents have been similarly trained can we just load a single checkpoint?
@@ -172,7 +128,7 @@ class MultiAgent():
 class Agent():
     """Interacts with and learns from the environment."""
     
-    def __init__(self, state_size, action_size, random_seed, with_memory = True, with_critic = True):
+    def __init__(self, state_size, action_size, random_seed, with_memory = True):
         """Initialize an Agent object.
         
         Params
@@ -192,11 +148,10 @@ class Agent():
         self.actor_target = Actor(state_size, action_size, random_seed).to(device)
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=LR_ACTOR)
 
-        if with_critic:
-            # Critic Network (w/ Target Network)
-            self.critic_local = Critic(state_size, action_size, random_seed).to(device)
-            self.critic_target = Critic(state_size, action_size, random_seed).to(device)
-            self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=LR_CRITIC, weight_decay=WEIGHT_DECAY)
+        # Critic Network (w/ Target Network)
+        self.critic_local = Critic(state_size, action_size, random_seed).to(device)
+        self.critic_target = Critic(state_size, action_size, random_seed).to(device)
+        self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=LR_CRITIC, weight_decay=WEIGHT_DECAY)
 
         # Noise process
         self.noise = OUNoise(action_size, random_seed)
@@ -222,7 +177,6 @@ class Agent():
         self.actor_local.eval()
         with torch.no_grad():
             action = self.actor_local(state).cpu().data.numpy()
-        # print(action)
         self.actor_local.train()
         if add_noise:
             action += self.noise.sample()
