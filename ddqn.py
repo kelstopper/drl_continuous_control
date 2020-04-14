@@ -31,8 +31,8 @@ parser.add_argument('--seed', type=int, default=2, help='random seed value')
 parser.add_argument('--gamma', type=float, default=GAMMA, help='gamma value')
 args = parser.parse_args()
 
-env = UnityEnvironment(file_name='app/Reacher.app')
-# env = UnityEnvironment(file_name='app/ReacherSingle.app')
+# env = UnityEnvironment(file_name='app/Reacher.app')
+env = UnityEnvironment(file_name='app/ReacherSingle.app')
 
 # get the default brain
 brain_name = env.brain_names[0]

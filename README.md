@@ -86,3 +86,113 @@ Then, place the file in the `p2_continuous-control/` folder in the DRLND GitHub 
 
 (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Crawler/Crawler_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
 
+
+
+## Training on AWS Deep Learning AMI (Ubuntu 16.04)
+
+Note:
+===
+
+When using this environment it will cost money! Make sure to shut down and terminate the environment you create.
+
+The expectation is to use the no vis environment for this training. Either the single agent or the 20 agent
+
+You should also be able to run this network locally by executing the command
+
+```bash
+python cnn.py
+```
+
+---
+
+### Step 1: Choose AMI
+
+Create a new instance in the EC2 panel and search for the AMI `ami-016ff5559334f8619` it can be found in region `us-east-1`
+
+Select continue
+
+##### OR
+
+Follow the build instruction here: [Training on Amazon Web Service](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)
+
+#### Step 2: Choose instance type
+
+Select Family: `GPU Instances` Type: `p2.xlarge`
+
+#### Step 3: Configure Instance
+
+next
+
+#### Step 4: Add Storage
+
+next
+
+#### Step 5: Add Tags
+
+configure any tags you see fit
+
+#### Step 6: Configure Security Group
+
+allow ssh connections (default) - create new security group
+
+#### Launch
+
+create new keypair and download
+
+when the instance is running connect to it using the pem file previously downloaded in `Step 6`
+
+```bash
+# change permissions on pem file
+chmod 600 ~/.ssh/p2-xlarge-drl.pem
+
+# connect
+ssh -i ~/.ssh/p2-xlarge-drl.pem ubuntu@{hostname found in ec2 dashboard}
+```
+
+Start x server and use it
+```bash
+# Start the X Server, press Enter to come back to the command line
+sudo /usr/bin/X :0 &
+
+# Check if Xorg process is running
+# You will have a list of processes running on the GPU, Xorg should be in the list.
+nvidia-smi
+
+# Make the ubuntu use X Server for display
+export DISPLAY=:0
+```
+
+Ensure it is configured
+```bash
+# For more information on glxgears, see ftp://www.x.org/pub/X11R6.8.1/doc/glxgears.1.html.
+glxgears
+# If Xorg is configured correctly, you should see the following message
+
+# Running synchronized to the vertical refresh.  The framerate should be
+# approximately the same as the monitor refresh rate.
+# 137296 frames in 5.0 seconds = 27459.053 FPS
+# 141674 frames in 5.0 seconds = 28334.779 FPS
+# 141490 frames in 5.0 seconds = 28297.875 FPS
+```
+
+```bash
+# clone environment from git
+git clone https://github.com/kelstopper/drl_navigation.git && cd drl_navigation
+
+# copy headless linux app
+curl https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/VisualBanana_Linux.zip > VisualBanana_Linux.zip
+unzip VisualBanana_Linux.zip
+
+# use the pytorch env
+source activate pytorch_p36
+pip install unityagents
+
+# run the cnn example, verify that it is running on CUDA in the logs
+## "Training on CUDA" <<< Should be present if "Training on CPU" is present you are training on cpu and it WILL take longer and cost more
+python cnn.py
+```
+
+Shutdown xorg?
+```bash
+sudo killall Xorg
+```

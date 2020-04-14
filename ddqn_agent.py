@@ -220,8 +220,12 @@ class Agent():
 
     def save(self, actor, critic):
         for i in range(self.num_agents):
-            torch.save(self.actors_local[i].state_dict(), '{}_{}.pth'.format(actor, i))
-            torch.save(self.critics_local[i].state_dict(), '{}_{}.pth'.format(critic, i))
+            torch.save(self.actors_local[i].state_dict(), 'checkpoints/{}_{}.pth'.format(actor, i))
+            torch.save(self.critics_local[i].state_dict(), 'checkpoints/{}_{}.pth'.format(critic, i))
+
+    def load(self, actor):
+        for i in range(self.num_agents):
+            self.actors_local[i].load_state_dict(torch.load('checkpoints/{}_{}.pth'.format(actor, i), map_location='cpu'))
 
 class OUNoise:
     """Ornstein-Uhlenbeck process."""
