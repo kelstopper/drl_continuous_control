@@ -20,6 +20,7 @@ UPDATE_EVERY = 1
 UPDATE_TIMES = 1
 
 parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('--filename', type=str, default='app/Reacher.app', help='the application you would like to run')
 parser.add_argument('--buffer_size', type=int, default=BUFFER_SIZE, help='size of the buffer')
 parser.add_argument('--batch_size', type=int, default=BATCH_SIZE, help='the size of batches to be processed')
 parser.add_argument('--lr_actor', type=float, default=LR_ACTOR, help='actors learning rate')
@@ -32,7 +33,8 @@ parser.add_argument('--gamma', type=float, default=GAMMA, help='gamma value')
 args = parser.parse_args()
 
 # env = UnityEnvironment(file_name='app/Reacher.app')
-env = UnityEnvironment(file_name='app/ReacherSingle.app')
+# env = UnityEnvironment(file_name='app/ReacherSingle.app')
+env = UnityEnvironment(file_name=args.filename)
 
 # get the default brain
 brain_name = env.brain_names[0]

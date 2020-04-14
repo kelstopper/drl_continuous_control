@@ -100,7 +100,8 @@ The expectation is to use the no vis environment for this training. Either the s
 You should also be able to run this network locally by executing the command
 
 ```bash
-python cnn.py
+# passing params - used in completion version scores + 30 over 100 episodes
+python ddqn.py --filename=app/Reacher.x86_64 --batch_size=1024 --update_every=20 --update_times=5 --lr_critic=0.0002 --lr_actor=0.0002 --weight_decay=0 --seed=2 --gamma=0.8
 ```
 
 ---
@@ -177,11 +178,16 @@ glxgears
 
 ```bash
 # clone environment from git
-git clone https://github.com/kelstopper/drl_navigation.git && cd drl_navigation
+git clone https://github.com/kelstopper/drl_continuous_control.git && cd drl_continuous_control
 
-# copy headless linux app
-curl https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/VisualBanana_Linux.zip > VisualBanana_Linux.zip
-unzip VisualBanana_Linux.zip
+# copy headless linux app YOU ONLY NEED 1 OF THE FOLLOWING
+# WITH ON AGENT
+curl https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Linux_NoVis.zip > app/Reacher_Linux_NoVis.zip
+#OR WITH 20 AGENTS
+curl https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Linux_NoVis.zip > app/Reacher_Linux_NoVis.zip
+
+cd app
+unzip Reacher_Linux_NoVis.zip
 
 # use the pytorch env
 source activate pytorch_p36
@@ -189,7 +195,15 @@ pip install unityagents
 
 # run the cnn example, verify that it is running on CUDA in the logs
 ## "Training on CUDA" <<< Should be present if "Training on CPU" is present you are training on cpu and it WILL take longer and cost more
-python cnn.py
+python ddqn.py --filename=app/Reacher.x86_64 --batch_size=1024 --update_every=20 --update_times=5 --lr_critic=0.0002 --lr_actor=0.0002 --weight_decay=0 --seed=2 --gamma=0.8
+```
+
+Run the trained environment locally
+
+```bash
+# DOWNLOAD INSTRUCTIONS
+download the saved png with the scores
+download the saved network weights
 ```
 
 Shutdown xorg?
