@@ -1,10 +1,9 @@
 [//]: # (Image References)
 
 [image1]: https://user-images.githubusercontent.com/10624937/43851024-320ba930-9aff-11e8-8493-ee547c6af349.gif "Trained Agent"
-[image2]: https://user-images.githubusercontent.com/10624937/43851646-d899bf20-9b00-11e8-858c-29b5c2c94ccc.png "Crawler"
+<!-- [image2]: https://user-images.githubusercontent.com/10624937/43851646-d899bf20-9b00-11e8-858c-29b5c2c94ccc.png "Crawler" -->
 
-
-# Project 2: Continuous Control
+# Continuous Control W/ Multi Agent DDQN
 
 ### Introduction
 
@@ -18,19 +17,19 @@ The observation space consists of 33 variables corresponding to position, rotati
 
 ### Distributed Training
 
-For this project, we will provide you with two separate versions of the Unity environment:
+In this project there are two versions that can be used for solving:
 - The first version contains a single agent.
-- The second version contains 20 identical agents, each with its own copy of the environment.  
+- The second version contains 20 identical agents, each with its own copy of the environment.
+
+Both copies can be downloaded in the getting started section.
 
 The second version is useful for algorithms like [PPO](https://arxiv.org/pdf/1707.06347.pdf), [A3C](https://arxiv.org/pdf/1602.01783.pdf), and [D4PG](https://openreview.net/pdf?id=SyZipzbCb) that use multiple (non-interacting, parallel) copies of the same agent to distribute the task of gathering experience.  
 
-### Solving the Environment
-
-Note that your project submission need only solve one of the two versions of the environment. 
+### Solving the Environment 
 
 #### Option 1: Solve the First Version
 
-The task is episodic, and in order to solve the environment,  your agent must get an average score of +30 over 100 consecutive episodes.
+The task is episodic, and in order to solve the environment,  your agent must get an average score of +30 over 100 consecutive episodes. An example of this running can be found in the notebook [here](done/Continuous_Control.ipynb) in the done folder (relevant checkpoints for this solve are there as well!)
 
 #### Option 2: Solve the Second Version
 
@@ -60,13 +59,11 @@ The environment is considered solved, when the average (over 100 episodes) of th
 
     (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Linux_NoVis.zip) (version 1) or [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Linux_NoVis.zip) (version 2) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
 
-2. Place the file in the DRLND GitHub repository, in the `p2_continuous-control/` folder, and unzip (or decompress) the file. 
-
 ### Instructions
 
-Follow the instructions in `Continuous_Control.ipynb` to get started with training your own agent!  
+Follow the instructions in `Continuous_Control.ipynb` to get started with training your own agent!
 
-### (Optional) Challenge: Crawler Environment
+<!-- ### (Optional) Challenge: Crawler Environment
 
 After you have successfully completed the project, you might like to solve the more difficult **Crawler** environment.
 
@@ -84,8 +81,7 @@ You need only select the environment that matches your operating system:
 
 Then, place the file in the `p2_continuous-control/` folder in the DRLND GitHub repository, and unzip (or decompress) the file.  Next, open `Crawler.ipynb` and follow the instructions to learn how to use the Python API to control the agent.
 
-(_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Crawler/Crawler_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._)
-
+(_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Crawler/Crawler_Linux_NoVis.zip) to obtain the "headless" version of the environment.  You will **not** be able to watch the agent without enabling a virtual screen, but you will be able to train the agent.  (_To watch the agent, you should follow the instructions to [enable a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md), and then download the environment for the **Linux** operating system above._) -->
 
 
 ## Training on AWS Deep Learning AMI (Ubuntu 16.04)
@@ -101,7 +97,7 @@ You should also be able to run this network locally by executing the command
 
 ```bash
 # passing params - used in completion version scores + 30 over 100 episodes
-python ddqn.py --filename=app/Reacher.x86_64 --batch_size=1024 --update_every=20 --update_times=5 --lr_critic=0.0002 --lr_actor=0.0002 --weight_decay=0 --seed=2 --gamma=0.8
+python ddqn.py --filename=app/Reacher_Linux_NoVis/Reacher.x86_64 --batch_size=1024 --update_every=10 --update_times=5 --lr_critic=0.0002 --lr_actor=0.0002 --weight_decay=0 --seed=2 --gamma=0.8
 ```
 
 ---
@@ -150,7 +146,7 @@ chmod 600 ~/.ssh/p2-xlarge-drl.pem
 ssh -i ~/.ssh/p2-xlarge-drl.pem ubuntu@{hostname found in ec2 dashboard}
 ```
 
-Start x server and use it
+<!-- Start x server and use it
 ```bash
 # Start the X Server, press Enter to come back to the command line
 sudo /usr/bin/X :0 &
@@ -174,28 +170,31 @@ glxgears
 # 137296 frames in 5.0 seconds = 27459.053 FPS
 # 141674 frames in 5.0 seconds = 28334.779 FPS
 # 141490 frames in 5.0 seconds = 28297.875 FPS
-```
+``` -->
 
 ```bash
 # clone environment from git
 git clone https://github.com/kelstopper/drl_continuous_control.git && cd drl_continuous_control
 
 # copy headless linux app YOU ONLY NEED 1 OF THE FOLLOWING
-# WITH ON AGENT
+# WITH ONE AGENT
 curl https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/one_agent/Reacher_Linux_NoVis.zip > app/Reacher_Linux_NoVis.zip
 #OR WITH 20 AGENTS
 curl https://s3-us-west-1.amazonaws.com/udacity-drlnd/P2/Reacher/Reacher_Linux_NoVis.zip > app/Reacher_Linux_NoVis.zip
 
-cd app
-unzip Reacher_Linux_NoVis.zip
+cd app && unzip Reacher_Linux_NoVis.zip && cd ..
 
 # use the pytorch env
 source activate pytorch_p36
 pip install unityagents
 
+# if running for an extended time you may need to reconfigure sshd by adding the following to /etc/ssh/sshd_config
+# ClientAliveInterval 300
+# ClientAliveCountMax 2
+
 # run the cnn example, verify that it is running on CUDA in the logs
 ## "Training on CUDA" <<< Should be present if "Training on CPU" is present you are training on cpu and it WILL take longer and cost more
-python ddqn.py --filename=app/Reacher.x86_64 --batch_size=1024 --update_every=20 --update_times=5 --lr_critic=0.0002 --lr_actor=0.0002 --weight_decay=0 --seed=2 --gamma=0.8
+python ddqn.py --filename=app/Reacher_Linux_NoVis/Reacher.x86_64 --batch_size=1024 --update_every=10 --update_times=5 --lr_critic=0.0002 --lr_actor=0.0002 --weight_decay=0 --seed=2 --gamma=0.8
 ```
 
 Run the trained environment locally
@@ -204,9 +203,4 @@ Run the trained environment locally
 # DOWNLOAD INSTRUCTIONS
 download the saved png with the scores
 download the saved network weights
-```
-
-Shutdown xorg?
-```bash
-sudo killall Xorg
 ```
