@@ -98,15 +98,6 @@ class Agent():
         self.critics_target = []
         self.critics_optimizer = []
 
-        # self.actor_local = Actor(state_size, action_size, random_seed).to(device)
-        # self.actor_target = Actor(state_size, action_size, random_seed).to(device)
-        # self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=self.lr_actor)
-
-        # # Critic Network (w/ Target Network)
-        # self.critic_local = Critic(state_size, action_size, random_seed).to(device)
-        # self.critic_target = Critic(state_size, action_size, random_seed).to(device)
-        # self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=self.lr_critic, weight_decay=self.weight_decay)
-
         for i in range(self.num_agents):
             # Actor Network (w/ Target Network)
             self.actors_local.append(Actor(state_size, action_size, random_seed).to(device))
@@ -129,14 +120,8 @@ class Agent():
     def step(self, states, actions, rewards, next_states, dones):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
-        # self.memory.add(states, actions, rewards, next_states, dones)
         for state, action, reward, next_state, done in zip(states, actions, rewards, next_states, dones):
             self.memory.add(state, action, reward, next_state, done)
-
-        # # Learn, if enough samples are available in memory
-        # if len(self.memory) > BATCH_SIZE:
-        #     experiences = self.memory.sample()
-        #     self.learn(experiences, GAMMA)
 
         self.t_step = (self.t_step + 1) % self.update_every
 
@@ -230,9 +215,6 @@ class Agent():
 class OUNoise:
     """Ornstein-Uhlenbeck process."""
 
-    # def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.05): # nope
-    # def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.085):
-    # def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.075): # longer training with less 0 scores
     def __init__(self, size, seed, mu=0., theta=0.15, sigma=0.1): # seems all over the place
         """Initialize parameters and noise process."""
         self.mu = mu * np.ones(size)
